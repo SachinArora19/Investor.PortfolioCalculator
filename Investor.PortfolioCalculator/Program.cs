@@ -71,7 +71,9 @@ public class Program
 
         try
         {
+            Console.WriteLine("Evaluating...");
             decimal portfolioValue = _portfolioCalculator.CalculatePortfolioValue(investorId, investorReferenceDate);
+            Console.WriteLine("Evaluated");
 
             Console.WriteLine($"Portfolio value for {investorId} on {referenceDate:yyyy-MM-dd}: {portfolioValue:C}");
         }

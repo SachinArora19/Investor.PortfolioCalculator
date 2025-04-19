@@ -33,6 +33,7 @@ public class PortfolioCalculatorLogic : IPortfolioCalculatorLogic
     {
         var investorInvestments = _investments.ByInvestorId(investorId).ToList();
 
+        Console.WriteLine($"Investor {investorId} has {investorInvestments.Count} investments.");
         return investorInvestments.Sum(investment =>
             CalculateInvestmentValue(investment.InvestmentId, referenceDate));
     }
