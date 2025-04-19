@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\Logger\Contracts\" />
-    <Folder Include="Helpers\Logger\Classes\" />
+    <Folder Include="Helpers\Logger\Implementations\" />
   </ItemGroup>
 
 </Project>

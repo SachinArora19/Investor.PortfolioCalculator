@@ -11,7 +11,7 @@ public class Program
     /// <summary>
     /// Instance of the portfolio calculator logic & logger, resolved via dependency injection.
     /// </summary>
-    public static IPortfolioCalculatorLogic _portfolioCalculator;
+    private static IPortfolioCalculatorLogic _portfolioCalculator;
     private static ILogger _logger;
 
     /// <summary>
