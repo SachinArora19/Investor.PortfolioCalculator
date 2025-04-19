@@ -47,7 +47,7 @@ public class Program
                 continue;
             }
             CalculatePortfolioByInvestorIdAndDate(input.First(), input.Last());
-            Console.WriteLine(line);
+            Console.WriteLine("Enter investorId and referenceDate (yyyy-MM-dd) separated by a semicolon. Press Enter to calculate the portfolio value or Ctrl+C to exit.");
             line = Console.ReadLine();
         }
     }

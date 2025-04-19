@@ -1,8 +1,14 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 
 public class DataRepository : IDataRepository
 {
+    private string _parentPath;
+    public DataRepository()
+    {
+        _parentPath = TryGetSolutionDirectoryInfo().FullName;
+    }
     /// <summary>
     /// Parses a CSV file into a list of objects of type T.
     /// </summary>
@@ -12,7 +18,7 @@ public class DataRepository : IDataRepository
     /// <returns>A list of parsed objects.</returns>
     public List<T> ParseFile<T>(string fileName, Func<string[], T> parseLine)
     {
-        var filePath = Path.Combine(System.IO.Path.GetFullPath(@"..\..\..\Data\CSV Data sources"), fileName);
+        var filePath = Path.Combine(_parentPath, @"Investor.PortfolioCalculator\Data\CSV Data sources", fileName);
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"File not found: {filePath}");
 
@@ -76,5 +82,16 @@ public class DataRepository : IDataRepository
             Date = DateTime.ParseExact(parts[2], "yyyy-MM-dd", CultureInfo.InvariantCulture),
             Value = decimal.Parse(parts[3], CultureInfo.InvariantCulture)
         };
+    }
+
+    private static DirectoryInfo TryGetSolutionDirectoryInfo(string currentPath = null)
+    {
+        var directory = new DirectoryInfo(
+            currentPath ?? Directory.GetCurrentDirectory());
+        while (directory != null && !directory.GetFiles("*.sln").Any())
+        {
+            directory = directory.Parent;
+        }
+        return directory;
     }
 }
