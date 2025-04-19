@@ -4,11 +4,13 @@ using Xunit;
 public class PortfolioCalculatorLogicUnitTests
 {
     private readonly Mock<IDataRepository> _mockRepository;
+    private readonly Mock<ILogger> _mockLogger; // Added mock for ILogger
     private readonly PortfolioCalculatorLogic _calculator;
 
     public PortfolioCalculatorLogicUnitTests()
     {
         _mockRepository = new Mock<IDataRepository>();
+        _mockLogger = new Mock<ILogger>(); // Initialize mock logger
 
         // Mock data for investments
         _mockRepository.Setup(repo => repo.ParseFile<Investment>("Investments.csv", It.IsAny<Func<string[], Investment>>()))
@@ -33,7 +35,7 @@ public class PortfolioCalculatorLogicUnitTests
                 new Quote { ISIN = "ISIN1", Date = DateTime.Parse("2025-01-01"), PricePerShare = 50 }
             });
 
-        _calculator = new PortfolioCalculatorLogic(_mockRepository.Object);
+        _calculator = new PortfolioCalculatorLogic(_mockRepository.Object, _mockLogger.Object); // Pass mock logger
     }
 
     [Fact]

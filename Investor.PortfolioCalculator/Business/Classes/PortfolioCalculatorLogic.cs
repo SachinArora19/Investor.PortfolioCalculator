@@ -9,6 +9,7 @@ public class PortfolioCalculatorLogic : IPortfolioCalculatorLogic
     private readonly IEnumerable<Investment> _investments;
     private readonly IEnumerable<Transaction> _transactions;
     private readonly IEnumerable<Quote> _quotes;
+    private readonly ILogger _logger;
     private readonly Dictionary<string, decimal> _cache = new Dictionary<string, decimal>();
     private readonly HashSet<string> _evaluating = new HashSet<string>();
 
@@ -16,11 +17,12 @@ public class PortfolioCalculatorLogic : IPortfolioCalculatorLogic
     /// Initializes a new instance of the <see cref="PortfolioCalculatorLogic"/> class.
     /// </summary>
     /// <param name="fileDataRepository">The data repository used to load investments, transactions, and quotes.</param>
-    public PortfolioCalculatorLogic(IDataRepository fileDataRepository)
+    public PortfolioCalculatorLogic(IDataRepository fileDataRepository, ILogger logger)
     {
         _investments = fileDataRepository.ParseFile<Investment>("Investments.csv", fileDataRepository.ParseInvestmentLine);
         _transactions = fileDataRepository.ParseFile<Transaction>("Transactions.csv", fileDataRepository.ParseTransactionLine);
         _quotes = fileDataRepository.ParseFile<Quote>("Quotes.csv", fileDataRepository.ParseQuoteLine);
+        _logger = logger;
     }
 
     /// <summary>
@@ -33,7 +35,7 @@ public class PortfolioCalculatorLogic : IPortfolioCalculatorLogic
     {
         var investorInvestments = _investments.ByInvestorId(investorId).ToList();
 
-        Console.WriteLine($"Investor {investorId} has {investorInvestments.Count} investments.");
+        _logger.LogInfo($"Investor {investorId} has {investorInvestments.Count} investments.");
         return investorInvestments.Sum(investment =>
             CalculateInvestmentValue(investment.InvestmentId, referenceDate));
     }
@@ -49,7 +51,7 @@ public class PortfolioCalculatorLogic : IPortfolioCalculatorLogic
         var investment = _investments.FirstOrDefault(i => i.InvestmentId == investmentId);
         if (investment == null)
         {
-            Console.WriteLine($"Investment doesn't exist for the ID: {investmentId}");
+            _logger.LogWarning($"Investment doesn't exist for the ID: {investmentId}");
             return 0;
         }
 

@@ -9,9 +9,10 @@ using System.Globalization;
 public class Program
 {
     /// <summary>
-    /// Instance of the portfolio calculator logic, resolved via dependency injection.
+    /// Instance of the portfolio calculator logic & logger, resolved via dependency injection.
     /// </summary>
     public static IPortfolioCalculatorLogic _portfolioCalculator;
+    private static ILogger _logger;
 
     /// <summary>
     /// Loads dependencies required for the application using a service provider.
@@ -24,6 +25,8 @@ public class Program
         AppServiceProvider app = new AppServiceProvider();
         _portfolioCalculator = app.GetService<IPortfolioCalculatorLogic>()
             ?? throw new InvalidOperationException("Failed to resolve IPortfolioCalculatorLogic from the service provider.");
+        _logger = app.GetService<ILogger>()
+            ?? throw new InvalidOperationException("Failed to resolve ILogger from the service provider.");
     }
 
     /// <summary>
@@ -35,19 +38,20 @@ public class Program
     {
         LoadDependencies();
 
-        Console.WriteLine("Enter investorId and referenceDate (yyyy-MM-dd) separated by a semicolon. Press Enter to calculate the portfolio value or Ctrl+C to exit.");
+        _logger.LogInfo("Application started.");
+        _logger.LogInfo("Enter investorId and referenceDate (yyyy-MM-dd) separated by a semicolon. Press Enter to calculate the portfolio value or Ctrl+C to exit.");
         var line = Console.ReadLine();
         while (!string.IsNullOrWhiteSpace(line))
         {
             var input = line.Split(";");
             if (input.Length != 2)
             {
-                Console.WriteLine("Invalid input. Please provide a valid investorId and a valid referenceDate (yyyy-MM-dd) separated by a semicolon.");
+                _logger.LogWarning("Invalid input. Please provide a valid investorId and a valid referenceDate (yyyy-MM-dd) separated by a semicolon.");
                 line = Console.ReadLine();
                 continue;
             }
             CalculatePortfolioByInvestorIdAndDate(input.First(), input.Last());
-            Console.WriteLine("Enter investorId and referenceDate (yyyy-MM-dd) separated by a semicolon. Press Enter to calculate the portfolio value or Ctrl+C to exit.");
+            _logger.LogInfo("Enter investorId and referenceDate (yyyy-MM-dd) separated by a semicolon. Press Enter to calculate the portfolio value or Ctrl+C to exit.");
             line = Console.ReadLine();
         }
     }
@@ -65,25 +69,25 @@ public class Program
     {
         if (!DateTime.TryParseExact(referenceDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime investorReferenceDate))
         {
-            Console.WriteLine("Invalid date format. Please use yyyy-MM-dd.");
+            _logger.LogError("Invalid date format. Please use yyyy-MM-dd.");
             return;
         }
 
         try
         {
-            Console.WriteLine("Evaluating...");
+            _logger.LogInfo("Evaluating...");
             decimal portfolioValue = _portfolioCalculator.CalculatePortfolioValue(investorId, investorReferenceDate);
-            Console.WriteLine("Evaluated");
+            _logger.LogInfo("Evaluated");
 
-            Console.WriteLine($"Portfolio value for {investorId} on {referenceDate:yyyy-MM-dd}: {portfolioValue:C}");
+            _logger.LogInfo($"Portfolio value for {investorId} on {referenceDate:yyyy-MM-dd}: {portfolioValue:C}");
         }
         catch (FileNotFoundException ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            _logger.LogError($"Error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+            _logger.LogError($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Investor.PortfolioCalculator.ServiceBuilderDI
             serviceProvider = new ServiceCollection()
                 .AddSingleton<IPortfolioCalculatorLogic, PortfolioCalculatorLogic>() // Business Layer Dependency
                 .AddSingleton<IDataRepository, DataRepository>() // Data Layer Dependency
+                .AddSingleton<ILogger, Logger>() //Registering the Logger
                 .BuildServiceProvider();
         }
 
